@@ -2,6 +2,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet
+from rest_framework.permissions import IsAuthenticated
 
 from todos.serializers import TareaSerializer
 from .models import Tarea
@@ -22,15 +23,17 @@ def crear_tarea(request):
 
 
 class TareaViewSet(ViewSet):
+    permission_classes = (IsAuthenticated, )
+
     def list(self, request):
-        lista_tareas = Tarea.objects.all()
+        lista_tareas = Tarea.objects.filter(owner_id=request.user.id)
         serializer = TareaSerializer(lista_tareas, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def create(self, request):
         serializer = TareaSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        serializer.save()
+        serializer.save(owner_id=request.user.id)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def retrieve(self, request, pk=None):
