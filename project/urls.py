@@ -16,7 +16,9 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
+from rest_framework.authtoken.views import ObtainAuthToken
 
+from seguridad.views import me
 from todos.views import crear_tarea, TareaViewSet
 
 api_router = DefaultRouter(trailing_slash=False)
@@ -27,4 +29,6 @@ urlpatterns = [
     path('api/todos', crear_tarea),
     path('api/todos/<int:id>', crear_tarea),
     path('api/v1/', include(api_router.urls)),
+    path('api/v1/login', ObtainAuthToken.as_view()),
+    path('api/v1/me', me),
 ]
